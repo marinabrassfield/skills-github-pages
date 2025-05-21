@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDX Broker - Elevate Onboarding Call Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 100; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; /* 10% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            max-width: 600px;
+            border-radius: 0.5rem;
+        }
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close-button:hover,
+        .close-button:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* Custom scrollbar for modal content if needed */
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold text-sky-700">IDX Broker - Elevate Onboarding Call Assistant</h1>
+            <p class="text-slate-600 mt-2">Your daily guide for managing Elevate migration onboarding calls.</p>
+        </header>
+
+        <section class="mb-8 p-6 bg-white rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4 text-sky-600">Quick Links</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <a href="[Insert Your Main Calendly Link for these calls]" target="_blank" class="block p-4 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors text-center font-medium">Calendly Bookings</a>
+                <a href="[Specify how to check this - e.g., IDX Broker Admin Panel > User Search > Account Flags/Notes]" target="_blank" class="block p-4 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors text-center font-medium">ToS Verification Tool</a>
+                <a href="[Link to Elevate Migration Onboarding Call Tracking Sheet]" target="_blank" class="block p-4 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-center font-medium">Tracking Sheet</a>
+                <a href="[Link to Detailed Call Notes Repository]" target="_blank" class="block p-4 bg-teal-500 text-white rounded-lg hover:bg-teal-600 transition-colors text-center font-medium">Call Notes Repository</a>
+                <button onclick="openModal('rescheduleEmailModal')" class="w-full p-4 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors text-center font-medium">Reschedule Email Template</button>
+            </div>
+        </section>
+
+        <section class="mb-8 p-6 bg-white rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4 text-sky-600">Today's Onboarding Calls</h2>
+            <p class="text-slate-600 mb-4">Manually list your calls here for quick reference. Max 4 calls per day.</p>
+            <div id="callSlots" class="space-y-3">
+                <div class="p-3 bg-slate-50 rounded-md border border-slate-200">Call 1: [Client Name] @ [Time] - Status: [e.g., ToS Verified]</div>
+                <div class="p-3 bg-slate-50 rounded-md border border-slate-200">Call 2: [Client Name] @ [Time] - Status: [e.g., Pending ToS Check]</div>
+                <div class="p-3 bg-slate-50 rounded-md border border-slate-200">Call 3: [Client Name] @ [Time] - Status: [...]</div>
+                <div class="p-3 bg-slate-50 rounded-md border border-slate-200">Call 4: [Client Name] @ [Time] - Status: [...]</div>
+            </div>
+        </section>
+
+        <section class="mb-8 p-6 bg-white rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4 text-sky-600">Pre-Call Process & Verification</h2>
+            <ul class="space-y-3 list-inside">
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200">
+                    <input type="checkbox" id="monitorCalendly" class="mr-2 rounded focus:ring-sky-500 text-sky-600">
+                    <label for="monitorCalendly">Monitor Calendly Bookings (Ongoing & Morning Check)</label>
+                </li>
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200">
+                    <input type="checkbox" id="verifyToS" class="mr-2 rounded focus:ring-sky-500 text-sky-600">
+                    <label for="verifyToS">Verify Client's ToS Agreement Status (for each booked call)</label>
+                    <p class="text-sm text-slate-500 ml-6">Use <a href="[Specify how to check this - e.g., IDX Broker Admin Panel > User Search > Account Flags/Notes]" target="_blank" class="text-sky-600 hover:underline">ToS Verification Tool</a>. Check 24hrs before or ASAP.</p>
+                </li>
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200">
+                    <span class="font-medium">If ToS NOT Agreed:</span>
+                    <ul class="space-y-2 list-inside list-disc ml-6 mt-2">
+                        <li>
+                            <input type="checkbox" id="contactClientReschedule" class="mr-2 rounded focus:ring-sky-500 text-sky-600">
+                            <label for="contactClientReschedule">Contact client (email/phone) to reschedule. Use <button onclick="openModal('rescheduleEmailModal')" class="text-sky-600 hover:underline">template</button>.</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="cancelCalendly" class="mr-2 rounded focus:ring-sky-500 text-sky-600">
+                            <label for="cancelCalendly">Cancel original Calendly event (Reason: "Awaiting ToS Agreement").</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="noteTrackingSheetReschedule" class="mr-2 rounded focus:ring-sky-500 text-sky-600">
+                            <label for="noteTrackingSheetReschedule">Note reschedule in <a href="[Link to Elevate Migration Onboarding Call Tracking Sheet]" target="_blank" class="text-sky-600 hover:underline">Tracking Sheet</a>.</label>
+                        </li>
+                    </ul>
+                </li>
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200">
+                    <span class="font-medium">If ToS Agreed:</span>
+                    <ul class="space-y-2 list-inside list-disc ml-6 mt-2">
+                         <li>
+                            <input type="checkbox" id="prepareCall" class="mr-2 rounded focus:ring-sky-500 text-sky-600">
+                            <label for="prepareCall">Prepare for call (review data, product package, resources, quiet environment).</label>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+
+        <section class="mb-8 p-6 bg-white rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4 text-sky-600">During Call Guide (1 Hour)</h2>
+            <ol class="space-y-3 list-decimal list-inside">
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200"><strong>Introduction & Goal Setting (5-10 mins):</strong> Welcome, purpose, client's goals.</li>
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200"><strong>Account Overview & Key Feature Navigation (20-25 mins):</strong> Dashboard tour, highlight 2-3 key features, show imported data, explain differences from Elevate.</li>
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200"><strong>Q&A and Addressing Concerns (15-20 mins):</strong> Open floor, address feature differences transparently.</li>
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200"><strong>Resources & Next Steps (5-10 mins):</strong> Point to KB articles/guides, support contacts, trial end/billing reminder, confirm follow-ups.</li>
+            </ol>
+        </section>
+
+        <section class="mb-8 p-6 bg-white rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4 text-sky-600">Post-Call Process</h2>
+            <ul class="space-y-3 list-inside">
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200">
+                    <input type="checkbox" id="updateTrackingSheet" class="mr-2 rounded focus:ring-sky-500 text-sky-600">
+                    <label for="updateTrackingSheet">Update <a href="[Link to Elevate Migration Onboarding Call Tracking Sheet]" target="_blank" class="text-sky-600 hover:underline">Tracking Sheet</a> (Immediately after call).</label>
+                     <p class="text-sm text-slate-500 ml-6">Include: Client Name, Email, Call Date, Attended, ToS Agreed, Topics, Sentiment, Follow-ups, Teammate Name.</p>
+                </li>
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200">
+                    <input type="checkbox" id="documentCallNotes" class="mr-2 rounded focus:ring-sky-500 text-sky-600">
+                    <label for="documentCallNotes">Document detailed call notes in <a href="[Link to Detailed Call Notes Repository]" target="_blank" class="text-sky-600 hover:underline">Call Notes Repository</a> (Within 24 hours).</label>
+                     <button onclick="openModal('callNotesTemplateModal')" class="ml-2 text-sm text-sky-600 hover:underline">(View Template)</button>
+                </li>
+                <li class="p-3 bg-slate-50 rounded-md border border-slate-200">
+                    <input type="checkbox" id="completeFollowUps" class="mr-2 rounded focus:ring-sky-500 text-sky-600">
+                    <label for="completeFollowUps">Complete any promised follow-up actions.</label>
+                </li>
+            </ul>
+        </section>
+
+        <footer class="text-center text-slate-500 text-sm mt-12 py-4 border-t border-slate-300">
+            Internal Tool for IDX Broker Support - Elevate Migration Project
+        </footer>
+    </div>
+
+    <div id="rescheduleEmailModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('rescheduleEmailModal')">&times;</span>
+            <h3 class="text-xl font-semibold mb-3 text-sky-600">Reschedule Email Template (ToS Not Agreed)</h3>
+            <div class="modal-body text-sm bg-slate-50 p-4 rounded max-h-96 overflow-y-auto">
+                <p><strong>Subject:</strong> Action Required: Rescheduling Your IDX Broker Onboarding Call</p>
+                <br>
+                <p>Hi [Client Name],</p>
+                <br>
+                <p>We see you've scheduled an onboarding call with us for [Date] at [Time] regarding your new IDX Broker Elite account. We're excited to help you get started!</p>
+                <br>
+                <p>Before we can proceed with the full onboarding session and dive into your account features, we need you to complete one important first step: please log into your new IDX Broker Elite account using your Elevate CRM credentials and agree to the Terms of Service. This step activates your full trial access.</p>
+                <br>
+                <p>Since this step hasn't been completed yet, we'll need to reschedule your current onboarding call.</p>
+                <br>
+                <p><strong>Please log in and agree to the Terms of Service at your earliest convenience.</strong> Once that's done, you can reschedule your onboarding call using this link: `[Insert Calendly Link]`</p>
+                <br>
+                <p>If you have any trouble logging in or have questions about this first step, please reply to this email or call us at 1-800-421-9668.</p>
+                <br>
+                <p>We apologize for any inconvenience and look forward to speaking with you once your account is fully activated!</p>
+                <br>
+                <p>Sincerely,</p>
+                <p>The IDX Broker Support Team</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="callNotesTemplateModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal('callNotesTemplateModal')">&times;</span>
+            <h3 class="text-xl font-semibold mb-3 text-sky-600">Call Notes Template Suggestion</h3>
+            <div class="modal-body text-sm bg-slate-50 p-4 rounded max-h-96 overflow-y-auto">
+                <ul>
+                    <li><strong>Client Name:</strong></li>
+                    <li><strong>Date of Call:</strong></li>
+                    <li><strong>Attended by (Teammate):</strong></li>
+                    <li><strong>Client's Main Goals/Concerns:</strong></li>
+                    <li><strong>Features Demonstrated:</strong></li>
+                    <li><strong>Key Questions Asked & Answers Provided:</strong></li>
+                    <li><strong>Client Feedback/Sentiment Details:</strong></li>
+                    <li><strong>Identified Issues/Pain Points:</strong></li>
+                    <li><strong>Follow-up Actions for Support (if any, with assignee and due date):</strong></li>
+                    <li><strong>Follow-up Actions for Client (if any):</strong></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = "block";
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = "none";
+        }
+
+        // Close modal if user clicks outside of it
+        window.onclick = function(event) {
+            const modals = document.getElementsByClassName('modal');
+            for (let i = 0; i < modals.length; i++) {
+                if (event.target == modals[i]) {
+                    modals[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>
